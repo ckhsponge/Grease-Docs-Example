@@ -20,7 +20,9 @@ ActionController::Routing::Routes.draw do |map|
     grease_doc.resources :people
   end
   map.grease_doc_edit_people 'grease_docs/:id/edit_people', :controller => 'grease_docs', :action => "edit_people"
-  map.grease_doc_refresh_people 'grease_docs/:id/refresh_people', :controller => 'grease_docs', :action => "refresh_people"
+  map.grease_doc_save_people 'grease_docs/:id/save_people', :controller => 'grease_docs', :action => "save_people"
+  map.grease_doc_save_people_continue 'grease_docs/:id/save_people_continue', :controller => 'grease_docs', :action => "save_people_continue"
+  map.grease_doc_revert_people 'grease_docs/:id/revert_people', :controller => 'grease_docs', :action => "revert_people"
   #map.resources :people
 
   # Sample resource route with options:

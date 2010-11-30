@@ -3,8 +3,8 @@ require "csv"
 class GreaseDocsController < ApplicationController
   #before_filter :google_spreadsheets_api
   before_filter :find_grease_doc
-  before_filter :google_doclist_api, :only => [:create, :edit_people, :refresh_people]
-  before_filter :google_spreadsheets_api, :only => [:refresh_people]
+  before_filter :google_doclist_api, :only => [:create, :edit_people, :revert_people, :save_people, :save_people_continue]
+  before_filter :google_spreadsheets_api, :only => [:save_people, :save_people_continue]
   
   # GET /grease_docs
   # GET /grease_docs.xml
@@ -92,6 +92,24 @@ class GreaseDocsController < ApplicationController
   def refresh_people
     @grease_doc.people_from_google
     render :action => "edit_people"
+  end
+  
+  def save_people
+    @grease_doc.people_from_google
+    redirect_to grease_doc_people_path(@grease_doc)
+  end
+  
+  def save_people_continue
+    @grease_doc.people_from_google
+    @grease_doc = GreaseDoc.find(@grease_doc.id)
+    @grease_doc.google_doclist_api = @google_doclist_api
+    @grease_doc.people_to_google
+    render :partial => "success"
+  end
+  
+  def revert_people
+    @grease_doc.people_to_google
+    render :partial => "success"
   end
   
   private

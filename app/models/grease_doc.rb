@@ -42,24 +42,41 @@ class GreaseDoc < ActiveRecord::Base
     response = api.get( self.url_csv )
     data = response.body
     puts data
-    header = nil
+    google_header = nil
+    existing_ids = self.people.collect{|p| p.id}
+    google_rows = []
     CSV::Reader.parse(data) do |row|
-      unless header
-        header = row
-        puts header.inspect
+      unless google_header
+        google_header = row
+        puts google_header.inspect
         next
       end
-      puts row.inspect
-      if row[0] && !row[0].empty?
-        person = Person.find_by_id(row[0])
-      else
-        person = Person.new(:grease_doc => self)
+      row[0] = (row[0] && !row[0].blank?) ? row[0].to_i : nil
+      google_rows << row if row && row.inject(false){|s,r| s || !r.blank?}
+    end
+    google_ids = google_rows.collect{|r| r[0]}.delete_if{|r| r.blank?}
+    puts "existing: #{existing_ids.inspect}"
+    puts "google: #{google_ids.inspect}"
+    puts "google rows: #{google_rows.inspect}"
+    Person.transaction do
+      google_rows.each do |row|
+        puts row.inspect
+        if existing_ids.include?(row[0])
+          person = Person.find_by_id(row[0])
+        else
+          person = Person.new(:grease_doc => self)
+        end
+        for i in 1...(google_header.size)
+          #puts "#{i} #{row[i]}"
+          person.send( "#{Person::CSV_COLUMNS[i]}=", row[i])
+        end
+        person.save!
       end
-      for i in 1...(header.size)
-        puts "#{i} #{row[i]}"
-        person.send( "#{Person::CSV_COLUMNS[i]}=", row[i])
+      missing_ids = existing_ids - google_ids
+      puts "missing: #{missing_ids.inspect}"
+      self.people.each do |person|
+        person.delete if missing_ids.include?(person.id)
       end
-      person.save!
     end
   end
   

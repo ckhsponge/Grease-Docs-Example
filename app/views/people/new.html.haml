@@ -1,0 +1,19 @@
+%h1 New person
+- form_for(@person) do |f|
+  = f.error_messages
+  = f.hidden_field :grease_doc_id
+  %p
+    = f.label :name
+    %br/
+    = f.text_field :name
+  %p
+    = f.label :iq
+    %br/
+    = f.text_field :iq
+  %p
+    = f.label :birthdate
+    %br/
+    = f.date_select :birthdate
+  %p
+    = f.submit "Create"
+= link_to 'Back', grease_doc_people_path(@grease_doc)

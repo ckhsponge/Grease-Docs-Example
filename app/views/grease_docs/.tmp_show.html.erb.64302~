@@ -1,0 +1,13 @@
+<p>
+  <b>Name:</b>
+  <%=h @grease_doc.name %>
+</p>
+
+<p>
+  <b>Key:</b>
+  <%=h @grease_doc.key %>
+</p>
+
+
+<%= link_to 'Edit', edit_grease_doc_path(@grease_doc) %> |
+<%= link_to 'Back', grease_docs_path %>

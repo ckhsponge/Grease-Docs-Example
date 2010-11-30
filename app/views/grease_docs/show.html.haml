@@ -1,0 +1,14 @@
+%p
+  %b Name:
+  = h @grease_doc.name
+%p
+  %b Key:
+  = h @grease_doc.key
+%p
+  %b Authkey:
+  = h @grease_doc.authkey
+= link_to 'Show People', grease_doc_people_path(@grease_doc)
+|
+= link_to 'Edit', edit_grease_doc_path(@grease_doc)
+|
+= link_to 'Back', grease_docs_path

@@ -1,0 +1,22 @@
+<h1>Listing grease_docs</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Key</th>
+  </tr>
+
+<% for grease_doc in @grease_docs %>
+  <tr>
+    <td><%=h grease_doc.name %></td>
+    <td><%=h grease_doc.key %></td>
+    <td><%= link_to 'Show', grease_doc %></td>
+    <td><%= link_to 'Edit', edit_grease_doc_path(grease_doc) %></td>
+    <td><%= link_to 'Destroy', grease_doc, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New grease_doc', new_grease_doc_path %>

@@ -1,0 +1,15 @@
+%p
+  %b Name:
+  = h @person.name
+%p
+  %b Iq:
+  = h @person.iq
+%p
+  %b Birthdate:
+  = h @person.birthdate
+%p
+  %b Grease doc:
+  = h @person.grease_doc_id
+= link_to 'Edit', edit_person_path(@person)
+|
+= link_to 'Back', grease_doc_people_path(@person.grease_doc)

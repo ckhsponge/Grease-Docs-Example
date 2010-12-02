@@ -1,10 +1,7 @@
 require "csv"
 
 class ExamsController < ApplicationController
-  #before_filter :google_spreadsheets_api
   before_filter :find_exam
-  before_filter :google_doclist_api, :only => [:create, :edit_people, :revert_people, :save_people, :save_people_continue]
-  before_filter :google_spreadsheets_api, :only => [:save_people, :save_people_continue]
   
   # GET /exams
   # GET /exams.xml
@@ -45,7 +42,6 @@ class ExamsController < ApplicationController
   # POST /exams.xml
   def create
     @exam = Exam.new(params[:exam])
-    @exam.google_doclist_api = @google_doclist_api
 
     respond_to do |format|
       if @exam.save
@@ -86,29 +82,28 @@ class ExamsController < ApplicationController
   end
   
   def edit_people
-    @exam.people_to_google
+    @exam.send_grease_doc
   end
   
   def refresh_people
-    @exam.people_from_google
+    @exam.send_grease_doc
     render :action => "edit_people"
   end
   
   def save_people
-    @exam.people_from_google
+    @exam.retrieve_grease_doc
     redirect_to exam_people_path(@exam)
   end
   
   def save_people_continue
-    @exam.people_from_google
+    @exam.retrieve_grease_doc
     @exam = Exam.find(@exam.id)
-    @exam.google_doclist_api = @google_doclist_api
-    @exam.people_to_google
+    @exam.send_grease_doc
     render :partial => "success"
   end
   
   def revert_people
-    @exam.people_to_google
+    @exam.send_grease_doc
     render :partial => "success"
   end
   
@@ -118,21 +113,4 @@ class ExamsController < ApplicationController
     @exam = Exam.find(params[:id]) if params[:id]
   end
   
-  def google_spreadsheets_api
-    unless @google_spreadsheets_api
-      @google_spreadsheets_api = ::GData::Client::Spreadsheets.new
-      @google_spreadsheets_api.clientlogin(ENV['GOOGLE_EMAIL'], ENV['GOOGLE_PASSWORD'], nil, nil, nil, "GOOGLE")
-    end
-    @exam.google_spreadsheets_api = @google_spreadsheets_api if @exam
-    return @google_spreadsheets_api
-  end
-  
-  def google_doclist_api
-    unless @google_doclist_api
-      @google_doclist_api = ::GData::Client::DocList.new
-      @google_doclist_api.clientlogin(ENV['GOOGLE_EMAIL'], ENV['GOOGLE_PASSWORD'], nil, nil, nil, "GOOGLE")
-    end
-    @exam.google_doclist_api = @google_doclist_api if @exam
-    return @google_doclist_api
-  end
 end

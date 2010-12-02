@@ -1,8 +1,8 @@
 %h1
   Editing
-= link_to @exam.url_share, @exam.url_share
+= link_to @exam.grease_doc_url, @exam.grease_doc_url
 %p
-%iframe{ :src => @exam.url_share, :style => "width:80%;height:600px"}
+%iframe{ :src => @exam.grease_doc_url, :style => "width:80%;height:600px"}
 #result
 %p
 = link_to "Save", exam_save_people_path(@exam)

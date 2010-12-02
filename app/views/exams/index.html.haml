@@ -1,4 +1,5 @@
 %h1 Listing exams
+You are an exam giver. Create exams and then record the IQ of the examinees.
 %table
   %tr
     %th Name
@@ -7,6 +8,6 @@
       %td= h exam.name
       %td= link_to 'Show People', exam_people_path(exam)
       %td= link_to 'Edit', edit_exam_path(exam)
-      %td= link_to 'Destroy', exam, :confirm => 'Are you sure?', :method => :delete
+      -#%td= link_to 'Destroy', exam, :confirm => 'Are you sure?', :method => :delete
 %br/
 = link_to 'New exam', new_exam_path

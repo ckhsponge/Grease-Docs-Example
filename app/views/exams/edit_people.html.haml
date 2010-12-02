@@ -1,14 +1,23 @@
 %h1
-  Editing
-= link_to @exam.grease_doc_url, @exam.grease_doc_url
+  Editing people in
+  %i
+    = @exam.name
+Before loading this page all data is pushed to this 
+= link_to "google spreadsheet.", @exam.grease_doc_url
+Edit people as needed. If you are signed in you can see the revision history in the File menu.
 %p
 %iframe{ :src => @exam.grease_doc_url, :style => "width:80%;height:600px"}
 #result
 %p
+When adding new rows there is no need to update the ID column. The IDs will be automatically updated upon save. Incorrect IDs will be overwritten with correct IDs.
+%p
 = link_to "Save", exam_save_people_path(@exam)
-|
+== - Retrieve the contents of the spreadsheet and return to the person list.
+%p
 = link_to_remote "Save and Continue", :url => exam_save_people_continue_url(@exam), :update => "result"
-|
+== - Retrieve the contents of the spreadsheet and then update the spreadsheet to correct or add missing IDs.
+%p
 = link_to_remote "Revert", :url => exam_revert_people_url(@exam), :update => "result"
+== - Push data to the spreadsheet again to revert any changes.
 %p
 = link_to "Back", exam_people_path(@exam)

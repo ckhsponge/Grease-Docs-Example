@@ -2,7 +2,7 @@ module GreaseDocModel
   
   def self.included(base)
     base.extend(ClassMethods)
-    base.before_create :init_grease_doc
+    base.after_create :init_grease_doc
   end
   
   module ClassMethods
@@ -120,6 +120,7 @@ module GreaseDocModel
   def init_grease_doc
     self.set_grease_doc_key
     self.set_grease_doc_authkey
+    self.save!
   end
   
   def has_grease_doc?
@@ -131,7 +132,7 @@ module GreaseDocModel
     xm.instruct!
     xm.entry(:xmlns => "http://www.w3.org/2005/Atom") do
       xm.category(:scheme => "http://schemas.google.com/g/2005#kind", :term => "http://schemas.google.com/docs/2007#spreadsheet")
-      xm.title self.name
+      xm.title "#{self.class.to_s} #{self.id}"
     end
     data = xm.target!
     api = GreaseDocAuthentication.google_doclist_api

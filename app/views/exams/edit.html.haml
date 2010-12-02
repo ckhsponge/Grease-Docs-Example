@@ -1,0 +1,12 @@
+%h1 Editing exam
+- form_for(@exam) do |f|
+  = f.error_messages
+  %p
+    = f.label :name
+    %br/
+    = f.text_field :name
+  %p
+    = f.submit "Update"
+= link_to 'Show', @exam
+|
+\#{link_to 'Back', exams_path}

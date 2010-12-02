@@ -3,7 +3,7 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :people
 
-  map.resources :grease_docs
+  map.resources :exams
 
   # The priority is based upon order of creation: first created -> highest priority.
 
@@ -16,13 +16,13 @@ ActionController::Routing::Routes.draw do |map|
   # This route can be invoked with purchase_url(:id => product.id)
 
   # Sample resource route (maps HTTP verbs to controller actions automatically):
-  map.resources :grease_docs do |grease_doc|
-    grease_doc.resources :people
+  map.resources :exams do |exam|
+    exam.resources :people
   end
-  map.grease_doc_edit_people 'grease_docs/:id/edit_people', :controller => 'grease_docs', :action => "edit_people"
-  map.grease_doc_save_people 'grease_docs/:id/save_people', :controller => 'grease_docs', :action => "save_people"
-  map.grease_doc_save_people_continue 'grease_docs/:id/save_people_continue', :controller => 'grease_docs', :action => "save_people_continue"
-  map.grease_doc_revert_people 'grease_docs/:id/revert_people', :controller => 'grease_docs', :action => "revert_people"
+  map.exam_edit_people 'exams/:id/edit_people', :controller => 'exams', :action => "edit_people"
+  map.exam_save_people 'exams/:id/save_people', :controller => 'exams', :action => "save_people"
+  map.exam_save_people_continue 'exams/:id/save_people_continue', :controller => 'exams', :action => "save_people_continue"
+  map.exam_revert_people 'exams/:id/revert_people', :controller => 'exams', :action => "revert_people"
   #map.resources :people
 
   # Sample resource route with options:
@@ -44,7 +44,7 @@ ActionController::Routing::Routes.draw do |map|
   #   end
 
   # You can have the root of your site routed with map.root -- just remember to delete public/index.html.
-  map.root :controller => "grease_docs"
+  map.root :controller => "exams"
 
   # See how all your routes lay out with "rake routes"
 

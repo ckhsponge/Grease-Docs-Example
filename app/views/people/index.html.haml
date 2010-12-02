@@ -1,8 +1,8 @@
 %h1 
   Listing people in
   %i
-    = h @grease_doc.name
-= link_to "Edit All", grease_doc_edit_people_path(@grease_doc)
+    = h @exam.name
+= link_to "Edit All", exam_edit_people_path(@exam)
 %table
   %tr
     %th Name
@@ -17,6 +17,6 @@
       %td= link_to 'Edit', edit_person_path(person)
       %td= link_to 'Destroy', person, :confirm => 'Are you sure?', :method => :delete
 %br/
-= link_to 'New person', new_grease_doc_person_path
+= link_to 'New person', new_exam_person_path
 |
-= link_to "Back", grease_docs_path
+= link_to "Back", exams_path

@@ -8,8 +8,8 @@
   %b Birthdate:
   = h @person.birthdate
 %p
-  %b Grease doc:
-  = h @person.grease_doc_id
+  %b Exam:
+  = h @person.exam_id
 = link_to 'Edit', edit_person_path(@person)
 |
-= link_to 'Back', grease_doc_people_path(@person.grease_doc)
+= link_to 'Back', exam_people_path(@person.exam)

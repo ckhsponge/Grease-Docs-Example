@@ -1,5 +1,5 @@
 class Person < ActiveRecord::Base
-  belongs_to :grease_doc
+  belongs_to :exam
   
   CSV_HEADER = ["ID", "Name", "IQ", "Birthdate"]
   CSV_COLUMNS = [:id, :name, :iq, :birthdate]

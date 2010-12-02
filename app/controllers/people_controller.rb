@@ -4,7 +4,7 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    @people = @grease_doc.people
+    @people = @exam.people
 
     respond_to do |format|
       format.html # index.html.erb
@@ -25,7 +25,7 @@ class PeopleController < ApplicationController
   # GET /people/new.xml
   def new
     @person = Person.new
-    @person.grease_doc = @grease_doc
+    @person.exam = @exam
 
     respond_to do |format|
       format.html # new.html.erb
@@ -83,7 +83,7 @@ class PeopleController < ApplicationController
   protected
   def find_objects
     @person = Person.find(params[:id]) if params[:id]
-    @grease_doc = GreaseDoc.find(params[:grease_doc_id]) if params[:grease_doc_id]
-    @grease_doc ||= @person.grease_doc if @person
+    @exam = Exam.find(params[:exam_id]) if params[:exam_id]
+    @exam ||= @person.exam if @person
   end
 end

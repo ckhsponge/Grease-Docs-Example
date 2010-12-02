@@ -1,0 +1,14 @@
+%p
+  %b Name:
+  = h @exam.name
+%p
+  %b Key:
+  = h @exam.grease_doc_key
+%p
+  %b Authkey:
+  = h @exam.grease_doc_authkey
+= link_to 'Show People', exam_people_path(@exam)
+|
+= link_to 'Edit', edit_exam_path(@exam)
+|
+= link_to 'Back', exams_path

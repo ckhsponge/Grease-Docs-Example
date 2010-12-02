@@ -9,21 +9,20 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101129220100) do
+ActiveRecord::Schema.define(:version => 20101201214445) do
+
+  create_table "exams", :force => true do |t|
+    t.string   "name"
+    t.string   "grease_doc_key"
+    t.string   "grease_doc_authkey"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "grease_docs", :force => true do |t|
     t.string   "name"
     t.string   "key"
     t.string   "authkey"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "people", :force => true do |t|
-    t.string   "name"
-    t.integer  "iq"
-    t.date     "birthdate"
-    t.integer  "grease_doc_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

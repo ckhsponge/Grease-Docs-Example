@@ -1,7 +1,7 @@
 %h1 New person
 - form_for(@person) do |f|
   = f.error_messages
-  = f.hidden_field :grease_doc_id
+  = f.hidden_field :exam_id
   %p
     = f.label :name
     %br/
@@ -16,4 +16,4 @@
     = f.date_select :birthdate
   %p
     = f.submit "Create"
-= link_to 'Back', grease_doc_people_path(@grease_doc)
+= link_to 'Back', exam_people_path(@exam)

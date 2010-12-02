@@ -1,0 +1,14 @@
+%h1
+  Editing
+= link_to @exam.url_share, @exam.url_share
+%p
+%iframe{ :src => @exam.url_share, :style => "width:80%;height:600px"}
+#result
+%p
+= link_to "Save", exam_save_people_path(@exam)
+|
+= link_to_remote "Save and Continue", :url => exam_save_people_continue_url(@exam), :update => "result"
+|
+= link_to_remote "Revert", :url => exam_revert_people_url(@exam), :update => "result"
+%p
+= link_to "Back", exam_people_path(@exam)

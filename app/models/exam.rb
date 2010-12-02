@@ -1,4 +1,4 @@
-class GreaseDoc < ActiveRecord::Base
+class Exam < ActiveRecord::Base
   has_many :people
   
   attr_accessor :google_doclist_api
@@ -7,11 +7,11 @@ class GreaseDoc < ActiveRecord::Base
   before_create :set_authkey
   
   def url_share
-    return "https://spreadsheets.google.com/ccc?key=#{self.key}&authkey=#{self.authkey}"
+    return "https://spreadsheets.google.com/ccc?key=#{self.grease_doc_key}&authkey=#{self.grease_doc_authkey}"
   end
   
   def url_csv
-    "https://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=#{self.key}&exportFormat=csv"
+    "https://spreadsheets.google.com/feeds/download/spreadsheets/Export?key=#{self.grease_doc_key}&exportFormat=csv"
   end
   
   def to_csv
@@ -29,7 +29,7 @@ class GreaseDoc < ActiveRecord::Base
     @google_doclist_api.headers["Content-Type"] = "text/csv"
     @google_doclist_api.headers["If-Match"] = "*"
     @google_doclist_api.version = "3.0"
-    response = @google_doclist_api.put("https://docs.google.com/feeds/default/media/document%3A#{self.key}", data)
+    response = @google_doclist_api.put("https://docs.google.com/feeds/default/media/document%3A#{self.grease_doc_key}", data)
     puts response.inspect
   end
   
@@ -64,7 +64,7 @@ class GreaseDoc < ActiveRecord::Base
         if existing_ids.include?(row[0])
           person = Person.find_by_id(row[0])
         else
-          person = Person.new(:grease_doc => self)
+          person = Person.new(:exam => self)
         end
         for i in 1...(google_header.size)
           #puts "#{i} #{row[i]}"
@@ -97,14 +97,14 @@ class GreaseDoc < ActiveRecord::Base
     feed = response.to_xml    
     feed.elements.each do |entry|
       if entry.text && (k = entry.text[/full\/spreadsheet%3A(.*)/, 1])
-        self.key = k
+        self.grease_doc_key = k
       end
     end
   end
   
   def set_authkey
     raise "google_doclist_api not set" unless @google_doclist_api
-    raise "key not set" unless self.key
+    raise "key not set" unless self.grease_doc_key
       
     data = <<-EOF
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl='http://schemas.google.com/acl/2007'>
@@ -115,11 +115,11 @@ class GreaseDoc < ActiveRecord::Base
 </entry>
 EOF
     @google_doclist_api.version = "3.0"
-    response = @google_doclist_api.post("https://docs.google.com/feeds/default/private/full/#{self.key}/acl", data)
+    response = @google_doclist_api.post("https://docs.google.com/feeds/default/private/full/#{self.grease_doc_key}/acl", data)
     
     feed = response.to_xml
     feed.elements.each("gAcl:withKey") do |entry|
-      self.authkey = entry.attributes["key"]
+      self.grease_doc_authkey = entry.attributes["key"]
     end
   end
 end

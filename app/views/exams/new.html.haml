@@ -1,5 +1,5 @@
-%h1 New grease_doc
-- form_for(@grease_doc) do |f|
+%h1 New exam
+- form_for(@exam) do |f|
   = f.error_messages
   %p
     = f.label :name
@@ -7,4 +7,4 @@
     = f.text_field :name
   %p
     = f.submit "Create"
-= link_to 'Back', grease_docs_path
+= link_to 'Back', exams_path

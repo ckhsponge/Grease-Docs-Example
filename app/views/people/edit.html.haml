@@ -1,7 +1,7 @@
 %h1 Editing person
 - form_for(@person) do |f|
   = f.error_messages
-  = f.hidden_field :grease_doc_id
+  = f.hidden_field :exam_id
   %p
     = f.label :name
     %br/
@@ -18,4 +18,4 @@
     = f.submit "Update"
 = link_to 'Show', @person
 |
-= link_to 'Back', grease_doc_people_path(@person.grease_doc)
+= link_to 'Back', exam_people_path(@person.exam)

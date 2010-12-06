@@ -3,10 +3,10 @@
   %i
     = @exam.name
 Before loading this page all data is pushed to this 
-= link_to "google spreadsheet.", @exam.grease_doc_url
+= link_to "google spreadsheet.", @exam.grease_doc.url
 Edit people as needed. If you are signed in you can see the revision history in the File menu.
 %p
-%iframe{ :src => @exam.grease_doc_url, :style => "width:80%;height:600px"}
+%iframe{ :src => @exam.grease_doc.url, :style => "width:80%;height:600px"}
 #result
 %p
 When adding new rows there is no need to update the ID column. The IDs will be automatically updated upon save. Incorrect IDs will be overwritten with correct IDs.

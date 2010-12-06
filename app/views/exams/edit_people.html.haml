@@ -20,4 +20,4 @@ When adding new rows there is no need to update the ID column. The IDs will be a
 = link_to_remote "Revert", :url => exam_revert_people_url(@exam), :update => "result"
 == - Push data to the spreadsheet again to revert any changes.
 %p
-= link_to "Back", exam_people_path(@exam)
+= link_to "Cancek", exam_cancel_edit_people_path(@exam)

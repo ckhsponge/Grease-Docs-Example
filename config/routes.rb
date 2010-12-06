@@ -20,6 +20,7 @@ ActionController::Routing::Routes.draw do |map|
     exam.resources :people
   end
   map.exam_edit_people 'exams/:id/edit_people', :controller => 'exams', :action => "edit_people"
+  map.exam_cancel_edit_people 'exams/:id/cancel_edit_people', :controller => 'exams', :action => "cancel_edit_people"
   map.exam_save_people 'exams/:id/save_people', :controller => 'exams', :action => "save_people"
   map.exam_save_people_continue 'exams/:id/save_people_continue', :controller => 'exams', :action => "save_people_continue"
   map.exam_revert_people 'exams/:id/revert_people', :controller => 'exams', :action => "revert_people"

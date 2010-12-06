@@ -82,16 +82,11 @@ class ExamsController < ApplicationController
   end
   
   def edit_people
-    @exam.send_grease_doc
-  end
-  
-  def refresh_people
-    @exam.send_grease_doc
-    render :action => "edit_people"
+    @exam.grease_doc_open
   end
   
   def save_people
-    @exam.retrieve_grease_doc
+    @exam.grease_doc_save
     redirect_to exam_people_path(@exam)
   end
   
@@ -105,6 +100,12 @@ class ExamsController < ApplicationController
   def revert_people
     @exam.send_grease_doc
     render :partial => "success"
+  end
+  
+  def cancel_edit_people
+    @exam.delete_grease_doc_authkey
+    @exam.save!
+    redirect_to exam_people_path(@exam)
   end
   
   private

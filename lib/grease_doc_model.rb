@@ -36,6 +36,18 @@ module GreaseDocModel
     end
   end
   
+  def grease_doc_open
+    self.send_grease_doc
+    self.set_grease_doc_authkey
+    self.save!
+  end
+  
+  def grease_doc_save
+    self.retrieve_grease_doc
+    self.delete_grease_doc_authkey
+    self.save!
+  end
+  
   def grease_doc_url
     return "https://spreadsheets.google.com/ccc?key=#{self.grease_doc_key}&authkey=#{self.grease_doc_authkey}"
   end
@@ -62,7 +74,7 @@ module GreaseDocModel
   
   def send_grease_doc
     data = self.grease_doc_csv
-    api = GreaseDocAuthentication.google_doclist_api
+    api = self.grease_doc_authentication.google_doclist_api
     api.headers["Content-Type"] = "text/csv"
     api.headers["If-Match"] = "*"
     api.version = "3.0"
@@ -73,7 +85,7 @@ module GreaseDocModel
   def retrieve_grease_doc
     puts self.grease_doc_csv
     #response = HTTParty.get( self.url_csv )
-    api = GreaseDocAuthentication.google_spreadsheets_api
+    api = self.grease_doc_authentication.google_spreadsheets_api
     api.version = "3.0"
     #api.headers["Content-Type"] = "text/html"
     response = api.get( self.grease_doc_url_csv )
@@ -135,7 +147,7 @@ module GreaseDocModel
       xm.title "#{self.class.to_s} #{self.id}"
     end
     data = xm.target!
-    api = GreaseDocAuthentication.google_doclist_api
+    api = self.grease_doc_authentication.google_doclist_api
     api.version = "2"
     response = api.post("https://docs.google.com/feeds/documents/private/full", data)
     
@@ -158,13 +170,36 @@ module GreaseDocModel
   <gAcl:scope type='default' />
 </entry>
 EOF
-    api = GreaseDocAuthentication.google_doclist_api
+    api = self.grease_doc_authentication.google_doclist_api
     api.version = "3.0"
-    response = api.post("https://docs.google.com/feeds/default/private/full/#{self.grease_doc_key}/acl", data)
+    response = api.put("https://docs.google.com/feeds/default/private/full/#{self.grease_doc_key}/acl/default", data)
     
     feed = response.to_xml
     feed.elements.each("gAcl:withKey") do |entry|
       self.grease_doc_authkey = entry.attributes["key"]
     end
+  end
+  
+  def delete_grease_doc_authkey
+    raise "key not set" unless self.grease_doc_key
+      
+    data = <<-EOF
+<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl='http://schemas.google.com/acl/2007'>
+  <category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/acl/2007#accessRule'/>
+  <gAcl:withKey key='[ACL KEY]'><gAcl:role value='none' /></gAcl:withKey>
+  <gAcl:scope type='default' />
+</entry>
+EOF
+    api = self.grease_doc_authentication.google_doclist_api
+    api.version = "3.0"
+    
+    response = api.put("https://docs.google.com/feeds/default/private/full/#{self.grease_doc_key}/acl/default", data)
+    #puts response.inspect
+    
+    self.grease_doc_authkey = nil
+  end
+  
+  def grease_doc_authentication
+    @grease_doc_authentication ||= GreaseDocAuthentication.new
   end
 end

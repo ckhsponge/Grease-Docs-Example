@@ -2,4 +2,7 @@ log
 .project
 .logs
 config/private.yml
+Capfile
+config/database_private.yml
+config/deploy.rb
 

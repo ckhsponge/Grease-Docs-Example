@@ -1,18 +1,34 @@
 class GreaseDoc
-  def initialize(record)
+  attr_accessor :key_field, :authkey_field
+  
+  def initialize(record, options = nil)
     @record = record
+    options ||= record.class.grease_doc_options
+    @column_fields = options[:column_fields]
+    @csv_header = options[:csv_header]
+    @collection_name = options[:collection_name]
+    @collection_class = options[:collection_class]
+    @association_name = options[:association_name]
+    
+    raise "no record set" unless @record
+    raise "column fields not set" unless @column_fields
+    raise "headers not set" unless @csv_header
+    raise "collection name not set" unless @collection_name
+    raise "collection class not set" unless @collection_class
+    raise "association name not set" unless @association_name
+    
+    @key_field = options[:key_field] || :grease_doc_key
+    @authkey_field = options[:authkey_field] || :grease_doc_authkey
   end
   
   def open
     self.send
     self.set_authkey
-    @record.save!
   end
   
   def save
     self.retrieve
     self.delete_authkey
-    @record.save!
   end
   
   def url
@@ -24,17 +40,16 @@ class GreaseDoc
   end
   
   def collection
-    @record.send(@record.class.grease_doc_collection_name)
+    @record.send(@collection_name)
   end
   
   def csv
-    raise "headers not set" unless @record.class.grease_doc_headers
     result = ""
-    columns = @record.class.grease_doc_headers.size
-    CSV.generate_row(@record.class.grease_doc_headers, columns, result)
+    column_count = @csv_header.size
+    CSV.generate_row(@csv_header, column_count, result)
     self.collection.each do |object|
-      csv_row = @record.class.grease_doc_column_fields.collect {|c| object.send(c)}
-      CSV.generate_row(csv_row, columns, result)
+      csv_row = @column_fields.collect {|c| object.send(c)}
+      CSV.generate_row(csv_row, column_count, result)
     end
     return result
   end
@@ -78,14 +93,14 @@ class GreaseDoc
       google_rows.each do |row|
         puts row.inspect
         if existing_ids.include?(row[0])
-          object = @record.class.grease_doc_collection_class.find_by_id(row[0])
+          object = @collection_class.find_by_id(row[0])
         else
-          object = @record.class.grease_doc_collection_class.new
-          object.send("#{@record.class.grease_doc_association_name}=", @record)
+          object = @collection_class.new
+          object.send("#{@association_name.to_s}=", @record)
         end
         for i in 1...(google_header.size)
           #puts "#{i} #{row[i]}"
-          object.send( "#{@record.class.grease_doc_column_fields[i]}=", row[i])
+          object.send( "#{@column_fields[i]}=", row[i])
         end
         object.save!
       end
@@ -98,15 +113,29 @@ class GreaseDoc
   end
   
   def exists?
-    return @record.grease_doc_key && @record.grease_doc_authkey
+    return !!self.key
+  end
+  
+  def editing?
+    return !!self.authkey
   end
   
   def key
-    @record.grease_doc_key
+    @record.send( @key_field )
+  end
+  
+  def key=(k)
+    @record.send( "#{@key_field}=", k )
+    @record.save!
   end
   
   def authkey
-    @record.grease_doc_authkey
+    @record.send( @authkey_field )
+  end
+  
+  def authkey=(k)
+    @record.send( "#{@authkey_field}=", k )
+    @record.save!
   end
   
   def set_key
@@ -114,7 +143,7 @@ class GreaseDoc
     xm.instruct!
     xm.entry(:xmlns => "http://www.w3.org/2005/Atom") do
       xm.category(:scheme => "http://schemas.google.com/g/2005#kind", :term => "http://schemas.google.com/docs/2007#spreadsheet")
-      xm.title "#{self.class.to_s} #{self.id}"
+      xm.title "#{@record.class.to_s} #{@record.id}"
     end
     data = xm.target!
     api = self.authentication.google_doclist_api
@@ -124,49 +153,40 @@ class GreaseDoc
     feed = response.to_xml    
     feed.elements.each do |entry|
       if entry.text && (k = entry.text[/full\/spreadsheet%3A(.*)/, 1])
-        @record.grease_doc_key = k
+       self.key = k
       end
     end
   end
   
   def set_authkey
-    raise "key not set" unless self.key
-      
-    data = <<-EOF
-<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl='http://schemas.google.com/acl/2007'>
-  <category scheme='http://schemas.google.com/g/2005#kind'
-    term='http://schemas.google.com/acl/2007#accessRule'/>
-  <gAcl:withKey key='[ACL KEY]'><gAcl:role value='writer' /></gAcl:withKey>
-  <gAcl:scope type='default' />
-</entry>
-EOF
-    api = self.authentication.google_doclist_api
-    api.version = "3.0"
-    response = api.put("https://docs.google.com/feeds/default/private/full/#{self.key}/acl/default", data)
+    response = update_acl( :writer )
     
     feed = response.to_xml
     feed.elements.each("gAcl:withKey") do |entry|
-      @record.grease_doc_authkey = entry.attributes["key"]
+      self.authkey = entry.attributes["key"]
     end
   end
   
-  def delete_grease_doc_authkey
+  def delete_authkey
+    response = update_acl( :none )
+    self.authkey = nil
+  end
+  
+  def update_acl( permission )
+    raise "invalid permission" unless [:none, :writer].include?(permission)
     raise "key not set" unless self.key
-      
+    
     data = <<-EOF
 <entry xmlns="http://www.w3.org/2005/Atom" xmlns:gAcl='http://schemas.google.com/acl/2007'>
   <category scheme='http://schemas.google.com/g/2005#kind' term='http://schemas.google.com/acl/2007#accessRule'/>
-  <gAcl:withKey key='[ACL KEY]'><gAcl:role value='none' /></gAcl:withKey>
+  <gAcl:withKey key='[ACL KEY]'><gAcl:role value='#{permission}' /></gAcl:withKey>
   <gAcl:scope type='default' />
 </entry>
 EOF
     api = self.authentication.google_doclist_api
     api.version = "3.0"
     
-    response = api.put("https://docs.google.com/feeds/default/private/full/#{self.key}/acl/default", data)
-    #puts response.inspect
-    
-    self.grease_doc_authkey = nil
+    return api.put("https://docs.google.com/feeds/default/private/full/#{self.key}/acl/default", data)
   end
   
   def authentication

@@ -81,30 +81,34 @@ class ExamsController < ApplicationController
     end
   end
   
+  #push data to google and display the editor
   def edit_people
     @exam.grease_doc.open
   end
   
+  #save data and close editor access
   def save_people
     @exam.grease_doc.save
     redirect_to exam_people_path(@exam)
   end
   
+  #save data and refresh display
   def save_people_continue
-    @exam.grease_doc.retrieve
-    @exam = Exam.find(@exam.id)
-    @exam.grease_doc.send
+    @exam.grease_doc.retrieve #get data from google and set any missing ids
+    @exam = Exam.find(@exam.id) #refresh object
+    @exam.grease_doc.send #send data back to object to update ids or other bad data
     render :partial => "success"
   end
   
+  #send data to google to undo any changes made there
   def revert_people
     @exam.grease_doc.send
     render :partial => "success"
   end
   
+  #close editor access without saving changes
   def cancel_edit_people
     @exam.grease_doc.delete_authkey
-    @exam.save!
     redirect_to exam_people_path(@exam)
   end
   

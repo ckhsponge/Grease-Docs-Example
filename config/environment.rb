@@ -28,7 +28,7 @@ Rails::Initializer.run do |config|
   # config.gem "sqlite3-ruby", :lib => "sqlite3"
   config.gem "haml"
   config.gem "gdata"
-  config.gem "httparty"
+  #config.gem "httparty"
 
   # Only load the plugins named here, in the order given. By default, all plugins 
   # in vendor/plugins are loaded in alphabetical order.
@@ -80,19 +80,20 @@ private_settings = YAML.load(File.read("#{RAILS_ROOT}/config/private.yml"))
 ENV['GOOGLE_EMAIL'] = private_settings['google_email']
 ENV['GOOGLE_PASSWORD'] = private_settings['google_password']
 
-module GData
-  module HTTP
-    class Request
-      def initialize(url, options = {})
-        @url = url
-        puts "Request #{url} - #{options.inspect}"
-        options.each do |key, value|
-          self.send("#{key}=", value)
-        end
-        
-        @method ||= :get
-        @headers ||= {}
-      end
-    end
-  end
-end
+#debugging
+#module GData
+#  module HTTP
+#    class Request
+#      def initialize(url, options = {})
+#        @url = url
+#        puts "Request #{url} - #{options.inspect}"
+#        options.each do |key, value|
+#          self.send("#{key}=", value)
+#        end
+#        
+#        @method ||= :get
+#        @headers ||= {}
+#      end
+#    end
+#  end
+#end

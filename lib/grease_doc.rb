@@ -61,37 +61,32 @@ class GreaseDoc
     api.headers["If-Match"] = "*"
     api.version = "3.0"
     response = api.put("https://docs.google.com/feeds/default/media/document%3A#{self.key}", data)
-    puts response.inspect
   end
   
   def retrieve
-    puts self.csv
     #response = HTTParty.get( self.url_csv )
     api = self.authentication.google_spreadsheets_api
     api.version = "3.0"
     #api.headers["Content-Type"] = "text/html"
     response = api.get( self.url_csv )
     data = response.body
-    puts data
     google_header = nil
     existing_ids = self.collection.collect{|p| p.id}
     google_rows = []
     CSV::Reader.parse(data) do |row|
       unless google_header
         google_header = row
-        puts google_header.inspect
         next
       end
       row[0] = (row[0] && !row[0].blank?) ? row[0].to_i : nil
       google_rows << row if row && row.inject(false){|s,r| s || !r.blank?}
     end
     google_ids = google_rows.collect{|r| r[0]}.delete_if{|r| r.blank?}
-    puts "existing: #{existing_ids.inspect}"
-    puts "google: #{google_ids.inspect}"
-    puts "google rows: #{google_rows.inspect}"
+    #puts "existing: #{existing_ids.inspect}"
+    #puts "google: #{google_ids.inspect}"
+    #puts "google rows: #{google_rows.inspect}"
     @record.class.transaction do
       google_rows.each do |row|
-        puts row.inspect
         if existing_ids.include?(row[0])
           object = @collection_class.find_by_id(row[0])
         else
@@ -99,13 +94,12 @@ class GreaseDoc
           object.send("#{@association_name.to_s}=", @record)
         end
         for i in 1...(google_header.size)
-          #puts "#{i} #{row[i]}"
           object.send( "#{@column_fields[i]}=", row[i])
         end
         object.save!
       end
       missing_ids = existing_ids - google_ids
-      puts "missing: #{missing_ids.inspect}"
+      #puts "missing: #{missing_ids.inspect}"
       self.collection.each do |object|
         object.delete if missing_ids.include?(object.id)
       end
